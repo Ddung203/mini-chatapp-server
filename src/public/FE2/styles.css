@@ -1,0 +1,15 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+#messages {
+  margin-bottom: 10px;
+}
+
+#message-input {
+  width: 200px;
+}
+
+button {
+  margin-left: 10px;
+}

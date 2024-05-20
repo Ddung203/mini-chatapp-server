@@ -1,14 +1,11 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import {
   createUser,
   getUserByUsername,
   getUsers,
 } from "../../repository/userRepository.js";
 import RSA from "../../public/rsa/rsaMD.js";
-
-// Sử dụng biến môi trường để lưu secret key
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
+import { generateJWTToken } from "../../utils/token.js";
 
 class AuthController {
   // Lấy danh sách người dùng (dùng cho mục đích test)
@@ -68,10 +65,8 @@ class AuthController {
       }
 
       // Tạo token JWT
-      const token = jwt.sign({ username: user.username }, JWT_SECRET, {
-        expiresIn: "1h",
-      });
-
+      const token = generateJWTToken({ username: user.username });
+      // console.log("token lg:>> ", token);
       res.status(200).json({ username: user.username, token });
     } catch (error) {
       // console.log("error :>> ", error);

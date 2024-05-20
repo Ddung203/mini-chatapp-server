@@ -1,4 +1,6 @@
 import { User } from "../entity/User.js";
+import { Conversation } from "../entity/Conversation.js";
+import { Message } from "../entity/Message.js";
 
 const dataSourceConfig = {
   type: "mysql",
@@ -8,7 +10,7 @@ const dataSourceConfig = {
   password: "",
   database: "atbm",
   synchronize: true,
-  entities: [User],
+  entities: [User, Conversation, Message],
 };
 
 export default dataSourceConfig;
