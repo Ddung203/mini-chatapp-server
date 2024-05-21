@@ -5,9 +5,17 @@ import {
   getUsers,
 } from "../../repository/userRepository.js";
 import RSA from "../../public/rsa/rsaMD.js";
-import { generateJWTToken } from "../../utils/token.js";
+import { generateJWTToken, verifyJWTToken } from "../../utils/token.js";
 
 class AuthController {
+  static refreshTokenHandler = (req, res) => {
+    const { token } = req.body;
+
+    if (verifyJWTToken(token) === "Invalid token")
+      return res.status(200).json("Invalid token");
+    return res.status(200).json("pong");
+  };
+
   // Lấy danh sách người dùng (dùng cho mục đích test)
   static getUsersHandler = async (req, res) => {
     try {

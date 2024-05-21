@@ -18,4 +18,13 @@ const verifyJWTToken = (token) => {
   }
 };
 
-export { generateJWTToken, verifyJWTToken };
+// Function to verify JWT token
+const verifyJWTTokenTime = (token) => {
+  try {
+    return jwt.verify(token, JWT_SECRET).exp > Math.floor(Date.now() / 1000);
+  } catch (error) {
+    return false;
+  }
+};
+
+export { generateJWTToken, verifyJWTToken, verifyJWTTokenTime };

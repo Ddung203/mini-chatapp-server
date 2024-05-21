@@ -7,6 +7,7 @@ import {
   createMessage,
   getMessagesByConversationId,
 } from "./src/repository/messageRepository.js";
+import { verifyJWTTokenTime } from "./src/utils/token.js";
 
 const httpServer = http.createServer(app);
 await initializeDataSource();
@@ -44,10 +45,16 @@ io.on("connection", async (socket) => {
   });
 
   // PART 2: Lắng nghe tin nhắn từ client
+  socket.on("sendToken", async (data) => {
+    const { roomID, token } = data;
+
+    io.to(roomID).emit("token status", verifyJWTTokenTime(token));
+  });
+
   socket.on("sendMessage", async (message) => {
     const { roomID, data } = message;
 
-    console.log("message: ", message);
+    // console.log("message: ", message);
 
     // Lưu tin nhắn vào database
     await createMessage(data);
