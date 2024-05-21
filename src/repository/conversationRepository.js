@@ -5,6 +5,8 @@ const conversationRepository = dataSource.getRepository("Conversation");
 export const createConversation = async ({
   participant1Username,
   participant2Username,
+  participant1publicKey,
+  participant2publicKey,
 }) => {
   // Kiểm tra xem cuộc trò chuyện đã tồn tại chưa
   let existingConversation = await conversationRepository.findOne({
@@ -25,6 +27,8 @@ export const createConversation = async ({
   const newConversation = conversationRepository.create({
     participant1Username,
     participant2Username,
+    participant1publicKey,
+    participant2publicKey,
   });
 
   return await conversationRepository.save(newConversation);

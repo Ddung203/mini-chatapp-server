@@ -6,10 +6,20 @@ import {
 
 class ConversationController {
   static createConversationHandler = async (req, res) => {
-    const { participant1Username, participant2Username } = req.body;
+    const {
+      participant1Username,
+      participant2Username,
+      participant1publicKey,
+      participant2publicKey,
+    } = req.body;
 
     try {
-      const newConversation = { participant1Username, participant2Username };
+      const newConversation = {
+        participant1Username,
+        participant2Username,
+        participant1publicKey: participant1publicKey,
+        participant2publicKey: participant2publicKey,
+      };
 
       const savedConversation = await createConversation(newConversation);
 
