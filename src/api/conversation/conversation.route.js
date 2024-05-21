@@ -16,4 +16,9 @@ router.post(
   ConversationController.getConversationHandler
 );
 
+router.get(
+  "/conversation/list",
+  ConversationController.getAllConversationHandler
+);
+
 export default router;

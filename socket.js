@@ -1,34 +1,59 @@
 import http from "http";
 import app from "./src/app.js";
 import { Server } from "socket.io";
+import { getConversations } from "./src/repository/conversationRepository.js";
+import { initializeDataSource } from "./src/config/dataSource.js";
+import {
+  createMessage,
+  getMessagesByConversationId,
+} from "./src/repository/messageRepository.js";
 
 const httpServer = http.createServer(app);
+await initializeDataSource();
+
 const PORT = 8181;
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://localhost:5174"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
   },
 });
 
-const messages = [];
-const clients = new Map();
+const messages = {}; // Chứa tin nhắn theo từng room {[], []}
+const rooms = await getConversations(); // []
 
-io.on("connection", (socket) => {
-  console.log("A user connected");
+io.on("connection", async (socket) => {
+  // console.log("\nA user connected");
 
-  // Gửi tin nhắn đã lưu trước đó cho người dùng mới kết nối
-  socket.emit("history", messages);
+  socket.emit("roomList", rooms);
 
-  // Lắng nghe tin nhắn từ client
-  socket.on("sendMessage", (message) => {
+  socket.on("joinRoom", async (roomID) => {
+    socket.join(roomID);
+    console.log(`User joined room: ${roomID}`);
+
+    messages[roomID] = await getMessagesByConversationId(roomID);
+
+    socket.emit("history", messages[roomID]);
+  });
+
+  socket.on("leaveRoom", (roomID) => {
+    socket.leave(roomID);
+    console.log(`User left room: ${roomID}`);
+  });
+
+  // PART 2: Lắng nghe tin nhắn từ client
+  socket.on("sendMessage", async (message) => {
+    const { roomID, data } = message;
+
     console.log("message: ", message);
 
-    messages.push(message);
+    // Lưu tin nhắn vào database
+    await createMessage(data);
 
-    io.emit("chat message", message);
+    messages[roomID] = await getMessagesByConversationId(roomID);
+    io.to(roomID).emit("chat message", messages[roomID]);
   });
 
   socket.on("disconnect", () => {
@@ -36,6 +61,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, async () => {
   console.log("Server is listening on http://localhost:" + PORT);
 });

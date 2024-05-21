@@ -44,3 +44,9 @@ export const getConversationByUsers = async ({
     ],
   });
 };
+
+export const getConversations = async () => {
+  const result = await conversationRepository.find();
+
+  return result.map((item) => (item = item.id));
+};

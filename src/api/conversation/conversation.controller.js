@@ -1,6 +1,7 @@
 import {
   createConversation,
   getConversationByUsers,
+  getConversations,
 } from "../../repository/conversationRepository.js";
 
 class ConversationController {
@@ -27,6 +28,16 @@ class ConversationController {
       const savedConversation = await getConversationByUsers(findConversation);
 
       return res.status(201).json(savedConversation);
+    } catch (error) {
+      console.log("error :>> ", error);
+    }
+  };
+
+  static getAllConversationHandler = async (req, res) => {
+    try {
+      const savedConversations = await getConversations();
+
+      return res.status(201).json(savedConversations);
     } catch (error) {
       console.log("error :>> ", error);
     }
