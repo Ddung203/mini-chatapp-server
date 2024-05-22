@@ -26,8 +26,6 @@ const messages = {}; // Chứa tin nhắn theo từng room {[], []}
 const rooms = await getConversations(); // []
 
 io.on("connection", async (socket) => {
-  // console.log("\nA user connected");
-
   socket.emit("roomList", rooms);
 
   socket.on("joinRoom", async (data) => {
@@ -38,16 +36,8 @@ io.on("connection", async (socket) => {
 
     messages[roomID] = await getMessagesByConversationId(roomID);
     socket.emit("history", messages[roomID]);
+    // socket.emit("history", {});
   });
-
-  //
-  let publicKey = {};
-  socket.on("myPublicKey", (data) => {
-    console.log(data);
-    publicKey = data.publicKey;
-  });
-
-  socket.emit("sent myPublicKey", publicKey);
 
   socket.on("leaveRoom", (roomID) => {
     socket.leave(roomID);
@@ -64,7 +54,7 @@ io.on("connection", async (socket) => {
   socket.on("sendMessage", async (message) => {
     const { roomID, data } = message;
 
-    console.log("\n1. message: ", message);
+    // console.log("\n1. message: ", message);
 
     // Lưu tin nhắn vào database
     await createMessage(data);
