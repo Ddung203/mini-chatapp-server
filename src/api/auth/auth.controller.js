@@ -2,7 +2,9 @@ import bcrypt from "bcrypt";
 import {
   createUser,
   getUserByUsername,
+  getUserPublicKey,
   getUsers,
+  updateUserPublicKey,
 } from "../../repository/userRepository.js";
 import RSA from "../../public/rsa/rsaMD.js";
 import { generateJWTToken, verifyJWTToken } from "../../utils/token.js";
@@ -33,11 +35,17 @@ class AuthController {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Tạo người dùng mới
+      // const newUser = {
+      //   username,
+      //   password: hashedPassword,
+      //   publicKey: JSON.stringify(RSA.sinhKhoaRSA().publicKey),
+      //   privateKey: JSON.stringify(RSA.sinhKhoaRSA().privateKey),
+      // };
       const newUser = {
         username,
         password: hashedPassword,
-        publicKey: JSON.stringify(RSA.sinhKhoaRSA().publicKey),
-        privateKey: JSON.stringify(RSA.sinhKhoaRSA().privateKey),
+        publicKey: "",
+        privateKey: "",
       };
 
       const savedUser = await createUser(newUser);
@@ -65,10 +73,9 @@ class AuthController {
       }
 
       // Tạo token JWT
-      const token = generateJWTToken({ username: user.username });
+      const token = generateJWTToken({ id: user.id, username: user.username });
       res.status(200).json({
         username: user.username,
-        participant1publicKey: user.publicKey,
         token,
       });
     } catch (error) {
@@ -80,6 +87,28 @@ class AuthController {
   // Route được bảo vệ
   static protectedRouteHandler = (req, res) => {
     res.status(200).json({ message: "You have accessed a protected route!" });
+  };
+
+  // SAVE public key
+  static savePublicKeyHandler = async (req, res) => {
+    const username = req.user.username;
+    console.log(
+      "🚀 ~ AuthController ~ savePublicKeyHandler= ~ username:",
+      username
+    );
+    const publicKey = JSON.stringify(req.body.publicKey);
+    console.log(
+      "🚀 ~ AuthController ~ savePublicKeyHandler= ~ publicKey:",
+      publicKey
+    );
+
+    const newUser = await updateUserPublicKey(username, publicKey);
+    return res.status(200).json(newUser);
+  };
+
+  static getReceiverPublicKeyHandler = async (req, res) => {
+    const user = await getUserPublicKey(req.query.receiver);
+    return res.status(200).json(user.publicKey);
   };
 }
 

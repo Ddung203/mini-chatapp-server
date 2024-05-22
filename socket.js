@@ -54,12 +54,14 @@ io.on("connection", async (socket) => {
   socket.on("sendMessage", async (message) => {
     const { roomID, data } = message;
 
-    // console.log("message: ", message);
+    console.log("\n1. message: ", message);
 
     // Lưu tin nhắn vào database
     await createMessage(data);
 
     messages[roomID] = await getMessagesByConversationId(roomID);
+
+    console.log("\n2. messages[roomID] :>> ", messages[roomID]);
     io.to(roomID).emit("chat message", messages[roomID]);
   });
 

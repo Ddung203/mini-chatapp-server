@@ -14,4 +14,16 @@ router.get(
   AuthController.protectedRouteHandler
 );
 
+router.post(
+  "/auth/save-publicKey",
+  authenticateJWT,
+  AuthController.savePublicKeyHandler
+);
+
+router.get(
+  "/auth/receiver-publicKey",
+  authenticateJWT,
+  AuthController.getReceiverPublicKeyHandler
+);
+
 export default router;

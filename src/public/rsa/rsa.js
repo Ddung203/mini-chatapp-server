@@ -20,7 +20,7 @@ const n = p * q;
 const phi = (p - 1) * (q - 1);
 
 let e = sinhSoNguyenToNgauNhien(phi);
-if (!kiemTra2soNTCungNhau(e, phi)) e = sinhSoNguyenToNgauNhien();
+while (!kiemTra2soNTCungNhau(e, phi)) e = sinhSoNguyenToNgauNhien();
 
 console.log("\ne = ", e);
 

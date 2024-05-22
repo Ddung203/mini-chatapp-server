@@ -35,3 +35,12 @@ export const updateUser = async (id, updatedUser) => {
 export const deleteUser = async (id) => {
   return await userRepository.delete(id);
 };
+
+export const updateUserPublicKey = async (username, publicKey) => {
+  await userRepository.update({ username }, { publicKey });
+  return await userRepository.findOneBy({ username });
+};
+
+export const getUserPublicKey = async (username) => {
+  return await userRepository.findOneBy({ username });
+};

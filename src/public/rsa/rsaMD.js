@@ -17,7 +17,7 @@ class RSA {
     this.n = this.p * this.q;
     this.phi = (this.p - 1) * (this.q - 1);
     this.e = sinhSoNguyenToNgauNhien(this.phi);
-    if (!kiemTra2soNTCungNhau(this.e, this.phi))
+    while (!kiemTra2soNTCungNhau(this.e, this.phi))
       this.e = sinhSoNguyenToNgauNhien();
     this.d = phanTuNghichDao(this.e, this.phi);
   }
