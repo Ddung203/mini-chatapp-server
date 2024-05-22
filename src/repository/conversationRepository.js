@@ -20,7 +20,23 @@ export const createConversation = async ({
   });
 
   if (existingConversation) {
-    return existingConversation;
+    await conversationRepository.update(
+      { id: existingConversation.id },
+      { participant1publicKey, participant2publicKey }
+    );
+
+    console.log(
+      await conversationRepository.findOneBy({
+        participant1Username,
+        participant2Username,
+      })
+    );
+
+    return await conversationRepository.findOneBy({
+      id: existingConversation.id,
+    });
+
+    // return existingConversation;
   }
 
   // Nếu cuộc trò chuyện chưa tồn tại, tạo mới

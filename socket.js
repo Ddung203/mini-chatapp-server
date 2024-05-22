@@ -30,14 +30,24 @@ io.on("connection", async (socket) => {
 
   socket.emit("roomList", rooms);
 
-  socket.on("joinRoom", async (roomID) => {
+  socket.on("joinRoom", async (data) => {
+    const roomID = data.roomID;
     socket.join(roomID);
-    console.log(`User joined room: ${roomID}`);
+
+    console.log(`User ${data.username} joined room: ${roomID}`);
 
     messages[roomID] = await getMessagesByConversationId(roomID);
-
     socket.emit("history", messages[roomID]);
   });
+
+  //
+  let publicKey = {};
+  socket.on("myPublicKey", (data) => {
+    console.log(data);
+    publicKey = data.publicKey;
+  });
+
+  socket.emit("sent myPublicKey", publicKey);
 
   socket.on("leaveRoom", (roomID) => {
     socket.leave(roomID);

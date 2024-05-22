@@ -92,15 +92,7 @@ class AuthController {
   // SAVE public key
   static savePublicKeyHandler = async (req, res) => {
     const username = req.user.username;
-    console.log(
-      "🚀 ~ AuthController ~ savePublicKeyHandler= ~ username:",
-      username
-    );
     const publicKey = JSON.stringify(req.body.publicKey);
-    console.log(
-      "🚀 ~ AuthController ~ savePublicKeyHandler= ~ publicKey:",
-      publicKey
-    );
 
     const newUser = await updateUserPublicKey(username, publicKey);
     return res.status(200).json(newUser);
