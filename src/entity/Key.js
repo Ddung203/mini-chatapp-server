@@ -1,7 +1,7 @@
 import { EntitySchema } from "typeorm";
 
-export const User = new EntitySchema({
-  name: "User",
+export const Key = new EntitySchema({
+  name: "Key",
   columns: {
     id: {
       type: "int",
@@ -12,8 +12,13 @@ export const User = new EntitySchema({
       type: "varchar",
       unique: true,
     },
-    password: {
+    publicKey: {
       type: "text",
+      nullable: true,
+    },
+    privateKey: {
+      type: "text",
+      nullable: true,
     },
   },
 });

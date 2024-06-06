@@ -4,7 +4,7 @@ export default {
   port: 3306,
   username: "root",
   password: "",
-  database: "atbm",
+  database: "atbm_2",
   synchronize: true,
   entities: ["src/entity/*.js"],
 };

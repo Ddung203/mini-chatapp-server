@@ -18,11 +18,11 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Cơ sở dữ liệu: `atbm`
+-- Cơ sở dữ liệu: `atbm_2`
 --
 
-CREATE DATABASE `atbm`;
-USE atbm;
+CREATE DATABASE `atbm_2`;
+USE atbm_2;
 
 -- --------------------------------------------------------
 
