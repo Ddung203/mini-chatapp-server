@@ -9,6 +9,7 @@ import {
 } from "./src/repository/messageRepository.js";
 import { verifyJWTTokenTime } from "./src/utils/token.js";
 import * as dotenv from "dotenv";
+import { updateUserStatus } from "./src/repository/userRepository.js";
 
 dotenv.config();
 
@@ -38,14 +39,15 @@ const startServer = async () => {
       socket.join(roomID);
 
       console.log(`User ${data.username} joined room: ${roomID}`);
-
+      await updateUserStatus(data.username, 1);
       messages[roomID] = await getMessagesByConversationId(roomID);
       socket.emit("history", messages[roomID]);
       // socket.emit("history", {});
     });
 
-    socket.on("leaveRoom", (roomID) => {
+    socket.on("leaveRoom", async (roomID) => {
       socket.leave(roomID);
+      // await updateUserStatus(data.username, 0);
       console.log(`User left room: ${roomID}`);
     });
 

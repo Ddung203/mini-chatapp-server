@@ -15,6 +15,7 @@ export const getAllUsersExceptUsername = async (username) => {
   return await userRepository.find({
     where: {
       username: Not(username),
+      isOnline: true,
     },
   });
 };
@@ -36,11 +37,7 @@ export const deleteUser = async (id) => {
   return await userRepository.delete(id);
 };
 
-export const updateUserPublicKey = async (username, publicKey) => {
-  await userRepository.update({ username }, { publicKey });
-  return await userRepository.findOneBy({ username });
-};
-
-export const getUserPublicKey = async (username) => {
+export const updateUserStatus = async (username, isOnline) => {
+  await userRepository.update({ username }, { isOnline });
   return await userRepository.findOneBy({ username });
 };

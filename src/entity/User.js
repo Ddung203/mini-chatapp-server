@@ -15,5 +15,10 @@ export const User = new EntitySchema({
     password: {
       type: "text",
     },
+    isOnline: {
+      type: "boolean",
+      default: false,
+      nullable: true,
+    },
   },
 });

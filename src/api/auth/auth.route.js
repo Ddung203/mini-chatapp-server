@@ -12,13 +12,10 @@ router.get(
   "/auth/protected",
   authenticateJWT,
   AuthController.protectedRouteHandler
-);
+); // Route test middleware
 
-router.post(
-  "/auth/save-publicKey",
-  authenticateJWT,
-  AuthController.savePublicKeyHandler
-);
+//! Key
+router.post("/auth/save-publicKey", AuthController.savePublicKeyHandler);
 
 router.get(
   "/auth/receiver-publicKey",

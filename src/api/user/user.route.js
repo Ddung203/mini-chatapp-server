@@ -10,4 +10,10 @@ router.get(
   UserController.getAllUsersExceptUsernameHandler
 );
 
+router.post(
+  "/user/set-status",
+  authenticateJWT,
+  UserController.setStatusUserHandler
+);
+
 export default router;

@@ -16,9 +16,10 @@ export const Key = new EntitySchema({
       type: "text",
       nullable: true,
     },
-    privateKey: {
+    privateKeyHash: {
       type: "text",
       nullable: true,
+      default: "",
     },
   },
 });
