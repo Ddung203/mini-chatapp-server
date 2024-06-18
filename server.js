@@ -10,35 +10,33 @@ import {
 import { verifyJWTTokenTime } from "./src/utils/token.js";
 import * as dotenv from "dotenv";
 import { updateUserStatus } from "./src/repository/userRepository.js";
+import { ioConfig } from "./src/config/io.config.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT_IO || 8181;
+const PORT = process.env.PORT || 8181;
 
 const startServer = async () => {
-  await initializeDataSource();
-
+  try {
+    await initializeDataSource();
+  } catch (error) {
+    return;
+  }
   const httpServer = http.createServer(app);
+  const io = new Server(httpServer, ioConfig);
 
-  const io = new Server(httpServer, {
-    cors: {
-      origin: ["http://localhost:5173", "http://localhost:5174"],
-      allowedHeaders: ["Content-Type"],
-      credentials: true,
-    },
-  });
-
-  const messages = {}; // Chứa tin nhắn theo từng room {[], []}
+  const messages = {};
   const rooms = await getConversations(); // []
 
   io.on("connection", async (socket) => {
-    socket.emit("roomList", rooms);
+    socket.emit("roomList", rooms); // return a list of room ids
 
     socket.on("joinRoom", async (data) => {
       const roomID = data.roomID;
-      socket.join(roomID);
 
-      console.log(`User ${data.username} joined room: ${roomID}`);
+      socket.join(roomID);
+      console.log(`${data.username} joined room: ${roomID}`);
+
       await updateUserStatus(data.username, 1);
       messages[roomID] = await getMessagesByConversationId(roomID);
       socket.emit("history", messages[roomID]);
@@ -51,7 +49,6 @@ const startServer = async () => {
       console.log(`User left room: ${roomID}`);
     });
 
-    // PART 2: Lắng nghe tin nhắn từ client
     socket.on("sendToken", async (data) => {
       const { roomID, token } = data;
 
@@ -61,14 +58,11 @@ const startServer = async () => {
     socket.on("sendMessage", async (message) => {
       const { roomID, data } = message;
 
-      // console.log("\n1. message: ", message);
-
-      // Lưu tin nhắn vào database
       await createMessage(data);
 
       messages[roomID] = await getMessagesByConversationId(roomID);
 
-      console.log("\n2. messages[roomID] :>> ", messages[roomID]);
+      console.log("\nmessages[roomID] :>> ", messages[roomID]);
       io.to(roomID).emit("chat message", messages[roomID]);
     });
 
