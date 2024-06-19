@@ -71,13 +71,14 @@ const startServer = async () => {
 
     socket.on("joinRoom", async (data) => {
       const roomID = data.roomID;
-      console.log("joinRoom~roomID :>> ", roomID);
       socket.join(roomID);
       console.log(`${data.username} joined room: ${data.roomID}`);
 
-      // messages[roomID] = await getMessagesByConversationId(roomID);
-      // socket.emit("history", messages[roomID]);
-      // socket.emit("history", {});
+      const messages = await getMessagesByConversationId(data.roomID);
+
+      // console.log("79. messages :>> ", messages);
+
+      io.to(data.roomID).emit("chatMessage", messages);
     });
 
     socket.on("leaveRoom", (data) => {
@@ -92,15 +93,20 @@ const startServer = async () => {
       io.to(roomID).emit("token status", verifyJWTTokenTime(token));
     });
 
-    socket.on("sendMessage", async (message) => {
-      const { roomID, data } = message;
+    socket.on("sendMessage", async (data) => {
+      // const { conversationId, content, senderUsername, receiverUsername } =
+      //   data;
+
+      // console.log("data :>> ", data);
 
       await createMessage(data);
+      // console.log("data.conversationId :>> ", data.conversationId);
 
-      messages[roomID] = await getMessagesByConversationId(roomID);
+      const messages = await getMessagesByConversationId(data.conversationId);
 
-      console.log("\nmessages[roomID] :>> ", messages[roomID]);
-      io.to(roomID).emit("chat message", messages[roomID]);
+      // console.log("sendMessage :>> ", messages);
+
+      io.to(data.conversationId).emit("chatMessage", messages);
     });
 
     socket.on("disconnect", async () => {
