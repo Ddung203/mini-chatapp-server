@@ -21,4 +21,9 @@ router.get(
   ConversationController.getAllConversationHandler
 );
 
+router.post(
+  "/conversation/roomID",
+  ConversationController.getConversationIDHandler
+);
+
 export default router;

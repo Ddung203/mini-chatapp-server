@@ -14,11 +14,5 @@ export const Conversation = new EntitySchema({
     participant2Username: {
       type: "varchar",
     },
-    participant1publicKey: {
-      type: "text",
-    },
-    participant2publicKey: {
-      type: "text",
-    },
   },
 });

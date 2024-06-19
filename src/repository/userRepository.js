@@ -11,6 +11,14 @@ export const getUsers = async () => {
   return await userRepository.find();
 };
 
+export const getAllUserOnline = async () => {
+  return await userRepository.find({
+    where: {
+      isOnline: true,
+    },
+  });
+};
+
 export const getAllUsersExceptUsername = async (username) => {
   return await userRepository.find({
     where: {
@@ -40,4 +48,13 @@ export const deleteUser = async (id) => {
 export const updateUserStatus = async (username, isOnline) => {
   await userRepository.update({ username }, { isOnline });
   return await userRepository.findOneBy({ username });
+};
+
+export const updateUserSocketId = async (username, socketId) => {
+  await userRepository.update({ username }, { socketId });
+  return await userRepository.findOneBy({ username });
+};
+
+export const getUserBySocketId = async (socketId) => {
+  return await userRepository.findOne({ where: { socketId } });
 };

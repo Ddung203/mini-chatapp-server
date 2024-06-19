@@ -20,5 +20,9 @@ export const User = new EntitySchema({
       default: false,
       nullable: true,
     },
+    socketId: {
+      type: "text",
+      nullable: true,
+    },
   },
 });

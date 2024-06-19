@@ -9,7 +9,13 @@ import {
 } from "./src/repository/messageRepository.js";
 import { verifyJWTTokenTime } from "./src/utils/token.js";
 import * as dotenv from "dotenv";
-import { updateUserStatus } from "./src/repository/userRepository.js";
+import {
+  getAllUserOnline,
+  getAllUsersExceptUsername,
+  getUserBySocketId,
+  updateUserSocketId,
+  updateUserStatus,
+} from "./src/repository/userRepository.js";
 import { ioConfig } from "./src/config/io.config.js";
 
 dotenv.config();
@@ -27,26 +33,57 @@ const startServer = async () => {
 
   const messages = {};
   const rooms = await getConversations(); // []
+  let userOnlineList = [];
 
   io.on("connection", async (socket) => {
     socket.emit("roomList", rooms); // return a list of room ids
 
+    socket.on("login", async (data) => {
+      const username = data.username;
+
+      console.log(`\n>> ${username} is online`);
+
+      await updateUserStatus(username, 1);
+      await updateUserSocketId(username, socket.id);
+
+      userOnlineList = await getAllUserOnline();
+
+      console.log("userOnlineList :: ", userOnlineList);
+
+      io.emit("userOnlineListChanged", userOnlineList);
+    });
+
+    socket.on("logout", async (username) => {
+      console.log(`\n>> ${username} is offline`);
+
+      await updateUserStatus(username, 0);
+      await updateUserSocketId(
+        username,
+        `${username}-disconnected-${socket.id}`
+      );
+
+      userOnlineList = await getAllUserOnline();
+
+      console.log("userOnlineList :>> ", userOnlineList);
+
+      io.emit("userOnlineListChanged", userOnlineList);
+    });
+
     socket.on("joinRoom", async (data) => {
       const roomID = data.roomID;
-
+      console.log("joinRoom~roomID :>> ", roomID);
       socket.join(roomID);
-      console.log(`${data.username} joined room: ${roomID}`);
+      console.log(`${data.username} joined room: ${data.roomID}`);
 
-      await updateUserStatus(data.username, 1);
-      messages[roomID] = await getMessagesByConversationId(roomID);
-      socket.emit("history", messages[roomID]);
+      // messages[roomID] = await getMessagesByConversationId(roomID);
+      // socket.emit("history", messages[roomID]);
       // socket.emit("history", {});
     });
 
-    socket.on("leaveRoom", async (roomID) => {
-      socket.leave(roomID);
-      // await updateUserStatus(data.username, 0);
-      console.log(`User left room: ${roomID}`);
+    socket.on("leaveRoom", (data) => {
+      console.log("== data.roomID :>> ", data.roomID);
+      socket.leave(data.roomID);
+      console.log(`>> User ${data.username} left room: ${data.roomID}`);
     });
 
     socket.on("sendToken", async (data) => {
@@ -66,8 +103,15 @@ const startServer = async () => {
       io.to(roomID).emit("chat message", messages[roomID]);
     });
 
-    socket.on("disconnect", () => {
-      console.log("User disconnected");
+    socket.on("disconnect", async () => {
+      const user = await getUserBySocketId(socket.id);
+      if (user) {
+        await updateUserStatus(user.username, 0);
+        io.emit("userStatusChanged", {
+          username: user.username,
+          status: "offline",
+        });
+      }
     });
   });
 
