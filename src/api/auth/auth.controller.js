@@ -84,6 +84,7 @@ class AuthController {
         status: "success",
         username: user.username,
         token,
+        publicKey: keyObject.publicKey,
         privateKeyHash: keyObject.privateKeyHash,
       });
     } catch (error) {

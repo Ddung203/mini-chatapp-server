@@ -94,17 +94,11 @@ const startServer = async () => {
     });
 
     socket.on("sendMessage", async (data) => {
-      // const { conversationId, content, senderUsername, receiverUsername } =
-      //   data;
-
-      // console.log("data :>> ", data);
-
       await createMessage(data);
-      // console.log("data.conversationId :>> ", data.conversationId);
 
       const messages = await getMessagesByConversationId(data.conversationId);
 
-      // console.log("sendMessage :>> ", messages);
+      console.log("sendMessage :>> ", messages);
 
       io.to(data.conversationId).emit("chatMessage", messages);
     });
