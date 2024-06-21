@@ -31,7 +31,6 @@ const startServer = async () => {
   const httpServer = http.createServer(app);
   const io = new Server(httpServer, ioConfig);
 
-  const messages = {};
   const rooms = await getConversations(); // []
   let userOnlineList = [];
 
@@ -48,7 +47,7 @@ const startServer = async () => {
 
       userOnlineList = await getAllUserOnline();
 
-      console.log("userOnlineList :: ", userOnlineList);
+      console.log("User Online List:: ", userOnlineList);
 
       io.emit("userOnlineListChanged", userOnlineList);
     });
@@ -64,7 +63,7 @@ const startServer = async () => {
 
       userOnlineList = await getAllUserOnline();
 
-      console.log("userOnlineList :>> ", userOnlineList);
+      console.log("User Online List:: ", userOnlineList);
 
       io.emit("userOnlineListChanged", userOnlineList);
     });
@@ -76,13 +75,10 @@ const startServer = async () => {
 
       const messages = await getMessagesByConversationId(data.roomID);
 
-      // console.log("79. messages :>> ", messages);
-
       io.to(data.roomID).emit("chatMessage", messages);
     });
 
     socket.on("leaveRoom", (data) => {
-      console.log("== data.roomID :>> ", data.roomID);
       socket.leave(data.roomID);
       console.log(`>> User ${data.username} left room: ${data.roomID}`);
     });
@@ -97,8 +93,6 @@ const startServer = async () => {
       await createMessage(data);
 
       const messages = await getMessagesByConversationId(data.conversationId);
-
-      console.log("sendMessage :>> ", messages);
 
       io.to(data.conversationId).emit("chatMessage", messages);
     });

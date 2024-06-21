@@ -124,9 +124,8 @@ class AuthController {
   };
 
   static getReceiverPublicKeyHandler = async (req, res) => {
-    console.log("req.query.receiver :>> ", req.query.receiver);
     const user = await getUserPublicKey(req.query.receiver);
-    // console.log("publicKey:: ", user.publicKey);
+
     return res.status(200).json(user?.publicKey);
   };
 }

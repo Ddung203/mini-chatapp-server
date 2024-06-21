@@ -61,8 +61,6 @@ class ConversationController {
         req.body.partnerUsername
       );
 
-      console.log("conversationID :>> ", conversationID);
-
       return res.status(201).json({
         status: "success",
         roomID: conversationID,

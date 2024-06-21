@@ -25,13 +25,6 @@ export const createConversation = async ({
       { participant1publicKey, participant2publicKey }
     );
 
-    console.log(
-      await conversationRepository.findOneBy({
-        participant1Username,
-        participant2Username,
-      })
-    );
-
     return await conversationRepository.findOneBy({
       id: existingConversation.id,
     });
