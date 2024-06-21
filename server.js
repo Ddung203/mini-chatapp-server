@@ -9,69 +9,103 @@ import {
 } from "./src/repository/messageRepository.js";
 import { verifyJWTTokenTime } from "./src/utils/token.js";
 import * as dotenv from "dotenv";
+import {
+  getAllUserOnline,
+  getAllUsersExceptUsername,
+  getUserBySocketId,
+  updateUserSocketId,
+  updateUserStatus,
+} from "./src/repository/userRepository.js";
+import { ioConfig } from "./src/config/io.config.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT_IO || 8181;
+const PORT = process.env.PORT || 8181;
 
 const startServer = async () => {
-  await initializeDataSource();
-
+  try {
+    await initializeDataSource();
+  } catch (error) {
+    return;
+  }
   const httpServer = http.createServer(app);
+  const io = new Server(httpServer, ioConfig);
 
-  const io = new Server(httpServer, {
-    cors: {
-      origin: ["http://localhost:5173", "http://localhost:5174"],
-      allowedHeaders: ["Content-Type"],
-      credentials: true,
-    },
-  });
-
-  const messages = {}; // Chứa tin nhắn theo từng room {[], []}
   const rooms = await getConversations(); // []
+  let userOnlineList = [];
 
   io.on("connection", async (socket) => {
-    socket.emit("roomList", rooms);
+    socket.emit("roomList", rooms); // return a list of room ids
+
+    socket.on("login", async (data) => {
+      const username = data.username;
+
+      console.log(`\n>> ${username} is online`);
+
+      await updateUserStatus(username, 1);
+      await updateUserSocketId(username, socket.id);
+
+      userOnlineList = await getAllUserOnline();
+
+      console.log("User Online List:: ", userOnlineList);
+
+      io.emit("userOnlineListChanged", userOnlineList);
+    });
+
+    socket.on("logout", async (username) => {
+      console.log(`\n>> ${username} is offline`);
+
+      await updateUserStatus(username, 0);
+      await updateUserSocketId(
+        username,
+        `${username}-disconnected-${socket.id}`
+      );
+
+      userOnlineList = await getAllUserOnline();
+
+      console.log("User Online List:: ", userOnlineList);
+
+      io.emit("userOnlineListChanged", userOnlineList);
+    });
 
     socket.on("joinRoom", async (data) => {
       const roomID = data.roomID;
       socket.join(roomID);
+      console.log(`${data.username} joined room: ${data.roomID}`);
 
-      console.log(`User ${data.username} joined room: ${roomID}`);
+      const messages = await getMessagesByConversationId(data.roomID);
 
-      messages[roomID] = await getMessagesByConversationId(roomID);
-      socket.emit("history", messages[roomID]);
-      // socket.emit("history", {});
+      io.to(data.roomID).emit("chatMessage", messages);
     });
 
-    socket.on("leaveRoom", (roomID) => {
-      socket.leave(roomID);
-      console.log(`User left room: ${roomID}`);
+    socket.on("leaveRoom", (data) => {
+      socket.leave(data.roomID);
+      console.log(`>> User ${data.username} left room: ${data.roomID}`);
     });
 
-    // PART 2: Lắng nghe tin nhắn từ client
     socket.on("sendToken", async (data) => {
       const { roomID, token } = data;
 
       io.to(roomID).emit("token status", verifyJWTTokenTime(token));
     });
 
-    socket.on("sendMessage", async (message) => {
-      const { roomID, data } = message;
-
-      // console.log("\n1. message: ", message);
-
-      // Lưu tin nhắn vào database
+    socket.on("sendMessage", async (data) => {
       await createMessage(data);
 
-      messages[roomID] = await getMessagesByConversationId(roomID);
+      const messages = await getMessagesByConversationId(data.conversationId);
 
-      console.log("\n2. messages[roomID] :>> ", messages[roomID]);
-      io.to(roomID).emit("chat message", messages[roomID]);
+      io.to(data.conversationId).emit("chatMessage", messages);
     });
 
-    socket.on("disconnect", () => {
-      console.log("User disconnected");
+    socket.on("disconnect", async () => {
+      const user = await getUserBySocketId(socket.id);
+      if (user) {
+        await updateUserStatus(user.username, 0);
+        io.emit("userStatusChanged", {
+          username: user.username,
+          status: "offline",
+        });
+      }
     });
   });
 

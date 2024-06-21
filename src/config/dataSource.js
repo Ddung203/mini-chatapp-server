@@ -9,5 +9,6 @@ export const initializeDataSource = async () => {
     console.log("Data source has been initialized!");
   } catch (error) {
     console.error("Error during data source initialization:", error);
+    throw error;
   }
 };

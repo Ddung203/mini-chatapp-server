@@ -1,4 +1,7 @@
-import { getAllUsersExceptUsername } from "../../repository/userRepository.js";
+import {
+  getAllUsersExceptUsername,
+  updateUserStatus,
+} from "../../repository/userRepository.js";
 
 class UserController {
   // Lấy danh sách người dùng ngoại trừ Username
@@ -10,6 +13,11 @@ class UserController {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
+  };
+
+  static setStatusUserHandler = async (req, res) => {
+    const user = await updateUserStatus(req.body.username, req.body.isOnline);
+    return res.status(200).json(user);
   };
 }
 

@@ -39,10 +39,7 @@ class MessageController {
 
   static getMessagesByUsersHandler = async (req, res) => {
     const { senderUsername, receiverUsername } = req.query;
-    console.log("{ senderUsername, receiverUsername } :>> ", {
-      senderUsername,
-      receiverUsername,
-    });
+
     try {
       const savedMessage = await getMessagesByUsers({
         senderUsername,

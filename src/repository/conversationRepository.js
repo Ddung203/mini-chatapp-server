@@ -25,13 +25,6 @@ export const createConversation = async ({
       { participant1publicKey, participant2publicKey }
     );
 
-    console.log(
-      await conversationRepository.findOneBy({
-        participant1Username,
-        participant2Username,
-      })
-    );
-
     return await conversationRepository.findOneBy({
       id: existingConversation.id,
     });
@@ -69,4 +62,26 @@ export const getConversations = async () => {
   const result = await conversationRepository.find();
 
   return result.map((item) => (item = item.id));
+};
+
+export const getConversationID = async (username1, username2) => {
+  let existingConversation = await conversationRepository.findOne({
+    where: [
+      { participant1Username: username1, participant2Username: username2 },
+      { participant1Username: username2, participant2Username: username1 },
+    ],
+  });
+
+  if (existingConversation) {
+    return existingConversation.id;
+  }
+
+  const newConversation = conversationRepository.create({
+    participant1Username: username1,
+    participant2Username: username2,
+  });
+
+  const savedConversation = await conversationRepository.save(newConversation);
+
+  return savedConversation.id;
 };
