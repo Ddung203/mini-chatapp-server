@@ -88,7 +88,7 @@ class AuthController {
         privateKeyHash: keyObject.privateKeyHash,
       });
     } catch (error) {
-      // console.log("error :>> ", error);
+      console.log("error :>> ", error);
       res.status(500).json({ message: error.message });
     }
   };
@@ -124,9 +124,10 @@ class AuthController {
   };
 
   static getReceiverPublicKeyHandler = async (req, res) => {
+    console.log("req.query.receiver :>> ", req.query.receiver);
     const user = await getUserPublicKey(req.query.receiver);
-    console.log("publicKey:: ", user.publicKey);
-    return res.status(200).json(user.publicKey);
+    // console.log("publicKey:: ", user.publicKey);
+    return res.status(200).json(user?.publicKey);
   };
 }
 
