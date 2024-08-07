@@ -20,7 +20,7 @@ import { ioConfig } from "./src/config/io.config.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 8181;
+const PORT = process.env.PORT || 3001;
 
 const startServer = async () => {
   try {

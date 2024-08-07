@@ -1,0 +1,42 @@
+services:
+  mini-chatapp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mini-chatapp-server
+    container_name: mini-chatapp-server
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - PORT=$PORT
+      - NODE_ENV=$NODE_ENV
+      - LOCAL_MYSQL_TYPE=$LOCAL_MYSQL_TYPE
+      - LOCAL_MYSQL_HOST=$LOCAL_MYSQL_HOST
+      - LOCAL_MYSQL_PORT=$LOCAL_MYSQL_PORT
+      - LOCAL_MYSQL_USERNAME=$LOCAL_MYSQL_USERNAME
+      - LOCAL_MYSQL_PASSWORD=$LOCAL_MYSQL_PASSWORD
+      - LOCAL_MYSQL_DATABASE=$LOCAL_MYSQL_DATABASE
+      - LOCAL_MYSQL_SYNCHRONIZE=$LOCAL_MYSQL_SYNCHRONIZE
+      - MYSQL_TYPE=$MYSQL_TYPE
+      - MYSQL_HOST=$MYSQL_HOST
+      - MYSQL_PORT=$MYSQL_PORT
+      - MYSQL_USERNAME=$MYSQL_USERNAME
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_DATABASE=$MYSQL_DATABASE
+      - MYSQL_SYNCHRONIZE=$MYSQL_SYNCHRONIZE
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  node_modules:
+# docker compose up -d
+# docker compose down

@@ -6,11 +6,6 @@ import userRouter from "../api/user/user.route.js";
 
 const router = express.Router();
 
-// router.use("/v1/api", authRouter);
-// router.use("/v1/api", conversationRouter);
-// router.use("/v1/api", messageRouter);
-// router.use("/v1/api", userRouter);
-
 router.use("/v2/api", authRouter);
 router.use("/v2/api", conversationRouter);
 router.use("/v2/api", messageRouter);

@@ -11,13 +11,7 @@ const app = express();
 app.use(helmet());
 app.use(compression());
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 
 app.use(morgan("dev"));
 
